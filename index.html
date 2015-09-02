@@ -1,0 +1,163 @@
+<!DOCTYPE>
+<html>
+
+<head>
+<title> chat</title>
+<link rel="stylesheet" type="text/css" href="main.css">
+</head>
+
+<body>
+
+<div class="chat">
+
+<input type="text" class="chatname" placeholder="Enter your name"/> </br>
+
+<div class="chatmessages" id="hello">
+
+</div>
+
+<textarea type="text" class="chattext" placeholder="Enter your message"></textarea>
+
+
+<div class="chatstatus">Status: <span> Idle </span>
+</div>
+
+</div>
+
+<script src="http://127.0.0.1:8080/socket.io/socket.io.js"></script>
+<script>
+(function(){
+ var getNode=function(s)
+{return document.querySelector(s);},
+
+// Get required nodes
+
+status=getNode('.chatstatus span'),
+messages=getNode('.chatmessages')
+textarea= getNode('.chat textarea'),
+chatname=getNode('.chatname');
+
+statusDefault=status.textContent,
+setStatus=function(s)
+{ status.textContent=s;
+
+if (s !== statusDefault)
+{
+ var delay= setTimeout(function()
+{
+setStatus(statusDefault);
+clearInterval(delay);
+
+},3000);
+
+}
+};
+
+
+try
+{var socket=io.connect('http://127.0.0.1:8080');}
+
+catch(e){
+//error
+}
+
+if(socket!== undefined)
+{
+// liten for the output
+
+//chatmessage.value="harsha";
+
+
+
+
+// liten for the output
+
+// end of listen for output
+
+
+
+
+
+   // document.getElementById("chatmessages").innerHTML = "harsha";
+	
+	//("<hr/>" +data['name'] + ':' data['message'] );
+socket.on('output',function(data)
+{
+console.log(data);
+//var name=data.name,
+//message=data.message;
+
+var br = document.createElement('br');
+
+console.log(data.id);
+console.log(data.message);
+console.log(data.sqltime);
+
+var newPara = document.createElement('p');
+var tBR = document.createElement('br');
+var div=document.getElementById('hello');
+
+var content = document.createTextNode(data.id+':'+data.message+'->'+data.sqltime);
+
+div.appendChild(content);
+div.appendChild(tBR);
+
+/*if(data)
+{
+while(data)
+{
+var message=document.createElement('div');
+message.setAttribute('class','chatmessage');
+message.textContent=data.name +':'+ data.message;
+
+//append
+//messages.appendChild(message);
+//messages.insertBefore(message,messages.firstChild);
+
+}}*/
+
+});
+
+
+
+// end of listen for output
+
+// listen for status
+socket.on('status', function(data)
+{
+setStatus(( typeof data ==='object') ? data.message :data);
+if(data.clear === true)
+{
+textarea.value='';
+}
+
+});
+
+//listen for keydown
+textarea.addEventListener('keydown',function(event)
+{var self=this,
+name=chatname.value;
+
+
+if(event.which===13 && event.shiftKey==false)
+{
+
+socket.emit('input',{
+name:name,
+message:self.value
+});
+
+ event.preventDefault();
+textarea.value='';
+}
+
+});
+
+}
+
+}) ();
+</script>
+
+
+</body>
+</html>
